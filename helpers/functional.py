@@ -335,6 +335,7 @@ proxy_builtin(type(example_generator))["filter"] = property(filterer);    hasatt
 
 from histogrammar import *
 from histogrammar.tutorial import cmsdata
+import threading
 
 class Events(object):
     class Iterator(object):
@@ -344,15 +345,27 @@ class Events(object):
         
         def __next__(self):
             if self.index >= len(self.parent.generated):
-                self.parent.generated.append(next(self.parent.generator))
+                raise StopIteration
             self.index += 1
             return self.parent.generated[self.index - 1]
         
         next = __next__
+    
+    class Filler(threading.Thread):
+        def __init__(self, parent):
+            super(Events.Filler, self).__init__()
+            self.parent = parent
+            self.daemon = True
         
+        def run(self):
+            while len(self.parent.generated) < 100000:
+                self.parent.generated.append(next(self.parent.generator))
+    
     def __init__(self):
         self.generator = cmsdata.EventIterator()
         self.generated = []
+        self.filler = self.Filler(self)
+        self.filler.start()
 
     def __iter__(self):
         return self.Iterator(self)
