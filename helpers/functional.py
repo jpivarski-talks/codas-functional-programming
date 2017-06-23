@@ -358,8 +358,25 @@ class Events(object):
             self.daemon = True
         
         def run(self):
+            event_fields = ("jets", "muons", "electrons", "photons", "met", "numPrimaryVertices")
+            jet_fields = ("px", "py", "pz", "E", "btag")
+            muon_fields = ("px", "py", "pz", "E", "q", "iso")
+            electron_fields = ("px", "py", "pz", "E", "q", "iso")
+            photon_fields = ("px", "py", "pz", "E", "iso")
+            met_fields = ("px", "py")
             while len(self.parent.generated) < 100000:
-                self.parent.generated.append(next(self.parent.generator))
+                event = next(self.parent.generator)
+                event.fields = event_fields
+                for jet in event.jets:
+                    jet.fields = jet_fields
+                for muon in event.muons:
+                    muon.fields = muon_fields
+                for electron in event.electrons:
+                    electron.fields = electron_fields
+                for photon in event.photons:
+                    photon.fields = photon_fields
+                event.met.fields = met_fields
+                self.parent.generated.append(event)
     
     def __init__(self):
         self.generator = cmsdata.EventIterator()
@@ -391,6 +408,9 @@ class Events(object):
         return filterer(self)
 
 events = Events()
+
+def MoreEvents():
+    return cmsdata.EventIterator()
 
 def histogrammarMethod(cls):
     def generatorProperty(lst):
