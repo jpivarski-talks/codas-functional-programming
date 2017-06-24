@@ -48,13 +48,16 @@ def taker(lst):
     Example: [1, 2, 3, 4, 5].take(3) == [1, 2, 3]
     """
     if isinstance(lst, list):
-        return lambda n: lst[:n]
+        out = lambda n: lst[:n]
     else:
         def gen(n):
             for i, x in enumerate(lst):
                 yield x
                 if i + 1 >= n: break
-        return lambda n: list(gen(n))
+        out = lambda n: list(gen(n))
+    out.func_name = "[...].take"
+    out.__doc__ = taker.__doc__
+    return out
 
 def mapper(lst):
     """
@@ -66,9 +69,12 @@ def mapper(lst):
               [1, 2, 3, 4, 5].map(lambda x: x + 100) == [101, 102, 103, 104, 105]
     """
     if isinstance(lst, list):
-        return lambda f: [f(x) for x in lst]
+        out = lambda f: [f(x) for x in lst]
     else:
-        return lambda f: (f(x) for x in lst)
+        out = lambda f: (f(x) for x in lst)
+    out.func_name = "[...].map"
+    out.__doc__ = mapper.__doc__
+    return out
 
 def flattener(lst):
     """
@@ -106,13 +112,16 @@ def flatmapper(lst):
     return a singleton list [result] when you have a result and an empty list [] when you don't.
     """
     if isinstance(lst, list):
-        return lambda f: sum((f(x) for x in lst), [])
+        out = lambda f: sum((f(x) for x in lst), [])
     else:
         def gen(f):
             for x in lst:
                 for y in f(x):
                     yield y
-        return gen
+        out = gen
+    out.func_name = "[...].flatmap"
+    out.__doc__ = flatmapper.__doc__
+    return out
 
 def filterer(lst):
     """
@@ -123,13 +132,16 @@ def filterer(lst):
     Example: [1, 2, 3, 4, 5].filter(lambda x: x > 2) == [3, 4, 5]
     """
     if isinstance(lst, list):
-        return lambda f: [x for x in lst if f(x)]
+        out = lambda f: [x for x in lst if f(x)]
     else:
         def gen(f):
             for x in lst:
                 if f(x):
                     yield x
-        return gen
+        out = gen
+    out.func_name = "[...].filter"
+    out.__doc__ = filterer.__doc__
+    return out
     
 def reducer(lst):
     """
@@ -141,7 +153,10 @@ def reducer(lst):
     Examples: [1, 2, 3, 4, 5].reduce(f) == f(f(f(f(1, 2), 3), 4), 5)
               [1, 2, 3, 4, 5].reduce(lambda x, y: x + y) == 15
     """
-    return lambda f: reduce(f, lst)
+    out = lambda f: reduce(f, lst)
+    out.func_name = "[...].reduce"
+    out.__doc__ = reducer.__doc__
+    return out
 
 def aggregator(lst):
     """
@@ -151,9 +166,12 @@ def aggregator(lst):
     
     Examples: [1, 2, 3, 4, 5].aggregate(f, 0) == f(f(f(f(f(0, 1), 2), 3), 4), 5)
               [1, 2, 3, 4, 5].aggregate(lambda x, y: x + y, 0) == 15
-              ("a", "b", "c").aggregate(lambda x, y: x + y, "") == "abc"
+              ["a", "b", "c"].aggregate(lambda x, y: x + y, "") == "abc"
     """
-    return lambda f, zero: reduce(f, lst, zero)
+    out = lambda f, zero: reduce(f, lst, zero)
+    out.func_name = "[...].aggregate"
+    out.__doc__ = aggregator.__doc__
+    return out
 
 def reducerright(lst):
     """
@@ -164,7 +182,10 @@ def reducerright(lst):
     
     Example: [1, 2, 3, 4, 5].reduceright(f) == f(1, f(2, f(3, f(4, 5))))
     """
-    return lambda f: reduce(lambda a, b: f(b, a), reversed(lst))
+    out = lambda f: reduce(lambda a, b: f(b, a), reversed(lst))
+    out.func_name = "[...].reduceright"
+    out.__doc__ = reducerright.__doc__
+    return out
 
 def aggregatorright(lst):
     """
@@ -174,7 +195,10 @@ def aggregatorright(lst):
     
     Example: [1, 2, 3, 4, 5].aggregateright(f, 0) == f(1, f(2, f(3, f(4, f(5, 0)))))
     """
-    return lambda f, zero: reduce(lambda a, b: f(b, a), reversed(lst), zero)
+    out = lambda f, zero: reduce(lambda a, b: f(b, a), reversed(lst), zero)
+    out.func_name = "[...].aggregateright"
+    out.__doc__ = aggregatorright.__doc__
+    return out
 
 def pairser(lst):
     """
@@ -200,7 +224,10 @@ def pairser(lst):
     
     Contrast with "table", which is like a nested loop over several lists, for all elements.
     """
-    return lambda f: [f(x, y) for i, x in enumerate(lst) for y in lst[i + 1:]]
+    out = lambda f: [f(x, y) for i, x in enumerate(lst) for y in lst[i + 1:]]
+    out.func_name = "[...].pairs"
+    out.__doc__ = pairser.__doc__
+    return out
 
 def tabler(lsts):
     """
@@ -244,7 +271,10 @@ def tabler(lsts):
     else:
         first = lsts[0]
         rest = lsts[1:]
-        return lambda f: [f(*args) for args in buildargs(first, *rest)]
+        out = lambda f: [f(*args) for args in buildargs(first, *rest)]
+    out.func_name = "[[...], [...], ...].table"
+    out.__doc__ = tabler.__doc__
+    return out
 
 def zipper(lsts):
     """
@@ -264,7 +294,10 @@ def zipper(lsts):
     if len(lsts) < 2:
         raise TypeError("zip requires at least two arguments")
     else:
-        return lambda f: [f(*args) for args in zip(*lsts)]
+        out = lambda f: [f(*args) for args in zip(*lsts)]
+    out.func_name = "[[...], [...], ...].zip"
+    out.__doc__ = zipper.__doc__
+    return out
 
 # attach the methods                                               force Python to notice
 proxy_builtin(list)["size"] = property(sizer);                     hasattr([], "size")
@@ -359,11 +392,11 @@ class Events(object):
         
         def run(self):
             event_fields = ("jets", "muons", "electrons", "photons", "met", "numPrimaryVertices")
-            jet_fields = ("px", "py", "pz", "E", "btag")
-            muon_fields = ("px", "py", "pz", "E", "q", "iso")
-            electron_fields = ("px", "py", "pz", "E", "q", "iso")
-            photon_fields = ("px", "py", "pz", "E", "iso")
-            met_fields = ("px", "py")
+            jet_fields = ("px", "py", "pz", "p", "pt", "mass", "eta", "phi", "E", "btag")
+            muon_fields = ("px", "py", "pz", "p", "pt", "mass", "eta", "phi", "E", "q", "iso")
+            electron_fields = ("px", "py", "pz", "p", "pt", "mass", "eta", "phi", "E", "q", "iso")
+            photon_fields = ("px", "py", "pz", "p", "pt", "mass", "eta", "phi", "E", "iso")
+            met_fields = ("px", "py", "pt")
             while len(self.parent.generated) < 100000:
                 event = next(self.parent.generator)
                 event.fields = event_fields
@@ -419,6 +452,8 @@ def histogrammarMethod(cls):
             for x in lst:
                 h.fill(x)
             return h
+        hargs.func_name = "[...]." + cls.__name__.replace("UntypedLabel", "Bundle")
+        hargs.__doc__ = cls.__doc__.replace("UntypedLabel", "Bundle")
         return hargs
     return generatorProperty
 
