@@ -6,7 +6,7 @@ import ctypes
 if hasattr(ctypes.pythonapi, "Py_InitModule4_64"):
     Py_ssize_t = ctypes.c_int64
 else:
-    ctypes.c_int
+    Py_ssize_t = ctypes.c_int
 
 class PyObject(ctypes.Structure): pass
 PyObject._fields_ = [("ob_refcnt", Py_ssize_t), ("ob_type", ctypes.POINTER(PyObject))]
