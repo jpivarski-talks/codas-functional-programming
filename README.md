@@ -7,7 +7,7 @@ To follow these lectures and execute the examples, you'll need
    * Jupyter with Python 2.7
    * Scala (for the third notebook)
 
-I recommend installing Jupyter through Miniconda. Follow [these instructions](https://conda.io/docs/install/quick.html) to install Miniconda (*with Python 2.7, not 3.5!*) and then
+I recommend installing Jupyter through Miniconda. Follow [these instructions](https://conda.io/docs/install/quick.html) to install Miniconda (*with Python 2.7, not 3.6!*) and then
 
 ```bash
 conda install jupyter
