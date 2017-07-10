@@ -4,10 +4,10 @@ You should be able to follow these lectures (and execute the examples) on your l
 
 To follow these lectures and execute the examples, you'll need
 
-   * Jupyter
+   * Jupyter with Python 2.7
    * Scala (for the third notebook)
 
-I recommend installing Jupyter through Miniconda. Follow [these instructions](https://conda.io/docs/install/quick.html) to install Miniconda and then
+I recommend installing Jupyter through Miniconda. Follow [these instructions](https://conda.io/docs/install/quick.html) to install Miniconda (*with Python 2.7, not 3.5!*) and then
 
 ```bash
 conda install jupyter
